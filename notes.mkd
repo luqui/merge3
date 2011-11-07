@@ -1,0 +1,60 @@
+Okay, so merge algorithms are not that complicated, but I just want to
+brainstorm a bit to get comfortable. We start with three sequences, call
+them `orig`, `left`, and `right`. We are trying to make a `result` which
+has both the changes made from `orig` to `left` and `orig` to `right`.
+We might give this equation:
+
+    result = orig + (left - orig) + (right - orig)
+
+I don't know how illuminating that is. Is it reasonable to simplify to
+
+    result = left + right - orig
+
+? Well we have these two versions of it:
+
+    result = left + (right - orig)
+    result = right + (left - orig)
+
+Which means that we can start with `left` and apply the patch for
+`right`, or start with `right` and apply the patch for `left`, and we
+should get the same thing: our desired `result`. 
+
+We can use the well-known LCS algorithm to construct a patch.  It gives
+us the sequences of preserved lines, and we can construct the rest from
+that.  Eg:
+
+    orig:       A B C   D E   F G H
+    left:       A B C K D   M   G H
+                -------------------
+    left-orig:  . . .+K .-E+M-F . .
+
+Now let's get another:
+
+    orig:       A B   C D E   F G H
+    right:      A   E C D   B F   H
+                ---------------
+    right-orig: .-B+E . .-E+B .-G .
+
+And now we will attempt a patch.  Let's call `left-orig` `L` and
+`right-orig` `R`.  We will attempt to apply both patches in parallel:
+
+    orig:       A B   C   D E   F G H
+    L:          . .   .+K .-E+M-F . .
+    R:          .-B+E .   .-E+B .-G .
+                ---------------------
+    orig+L+R    A   E C K D   *     H
+
+Giving us the final result
+
+    A E C K D * H
+
+where `*` is a conflict. 
+
+There are a few rules here that I discovered when lining up the above.
+`.` corresponds to a position in the _original_, we don't account for
+any additions from the other patch.  `-X` works the same way.  `+X`
+wedges its way in between points of the original, creating space for
+itself.
+
+<!-- vim: tw=72 
+-->
