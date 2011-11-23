@@ -2,6 +2,8 @@
 <head>
 <title>Merged output</title>
 <style>
+pre { margin: 0 }
+
 pre.left.addleft  { background: #bbffbb }
 pre.left.addright { color: white }
 pre.left.addboth  { background: #bbffbb }
@@ -26,9 +28,9 @@ pre.conflict      { background: #ff8888 }
 <?php
 include_once('DiffModule.php');
 $diff = new DiffModule();
-$merged = $diff->merge3(explode("\n", $_POST['orig']), 
-                        explode("\n", $_POST['left']),
-                        explode("\n", $_POST['right']));
+$merged = $diff->merge3(preg_split('/\r?\n/', $_POST['orig']), 
+                        preg_split('/\r?\n/', $_POST['left']),
+                        preg_split('/\r?\n/', $_POST['right']));
 ?>
 
 <table><tr><td><?php

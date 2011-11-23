@@ -1,48 +1,82 @@
 <?php
 
 class DiffModule {
+    function dump_table($table, $R, $C) {
+        echo('<table><tr>');
+        echo('<td></td>');
+        for ($j = 0; $j < count($C); $j++) {
+            echo ('<td>'.$C[$j].'</td>');
+        }
+        echo ('</tr>');
+        
+        for ($i = 0; $i < count($R); $i++) {
+            echo('<tr>');
+            echo('<td>'.$R[$i].'</td>');
+            for ($j = 0; $j < count($C); $j++) {
+                $len = $table[$i][$j][0];
+                $dlen = $table[$i][$j][1];
+                $dir = $table[$i][$j][2];
+                if ($dir == 0) { $dirch = '&#8598;'; }
+                else if ($dir == 1) { $dirch = '&#8592;'; }
+                else if ($dir == 2) { $dirch = '&#8593;'; }
+                echo("<td>($len, $dlen, $dirch)</td>");
+            }
+            echo ('</tr>');
+        }
+        echo('</table>');
+    }
+
     function diff($R, $C) {
         // see en.wikipedia.org/wiki/Longest_common_subsequence for algorithm
         
-        // Each element in the table is a 2-array: [length, direction].
+        // Each element in the table is a 3-array: [length, difflength, direction].
         $LENGTH = 0;
-        $DIRECTION = 1;
+        $DIFFLENGTH = 1;
+        $DIRECTION = 2;
         
         // Direction is:
         $UPLEFT = 0;  //  (keep)
         $LEFT   = 1;  //  (dec col)
         $UP     = 2;  //  (dec row)
-        $BOTH   = 3;
 
         for ($i = 0; $i < count($R); $i++) {
-            $table[$i][-1] = array(0, $UP);
+            $table[$i][-1] = array(0, $i+1, $UP);
         }
         for ($j = 0; $j < count($C); $j++) {
-            $table[-1][$j] = array(0, $LEFT);
+            $table[-1][$j] = array(0, $i+1, $LEFT);
         }
-        $table[-1][-1] = array(0,0);
+        $table[-1][-1] = array(0,0,0);
 
         // Fill in the table.
         for ($i = 0; $i < count($R); $i++) {
             for ($j = 0; $j < count($C); $j++) {
                 if ($this->compare($R[$i], $C[$j])) {
-                    $table[$i][$j] = array(1 + $table[$i-1][$j-1][$LENGTH], $UPLEFT);
+                    $table[$i][$j] = array(1 + $table[$i-1][$j-1][$LENGTH], $table[$i-1][$j-1][$DIFFLENGTH], $UPLEFT);
                 }
                 else {
-                    $lenleft = $table[$i][$j-1][$LENGTH];
-                    $lenup   = $table[$i-1][$j][$LENGTH];
-                    if ($lenleft > $lenup) {
-                        $table[$i][$j] = array($lenleft, $LEFT);
+                    $left = $table[$i][$j-1];
+                    $up   = $table[$i-1][$j];
+                    if ($left[$LENGTH] > $up[$LENGTH]) {
+                        $table[$i][$j] = array($left[$LENGTH], $left[$DIFFLENGTH]+1, $LEFT);
                     }
-                    else if ($lenup > $lenleft) {
-                        $table[$i][$j] = array($lenup, $UP);
+                    else if ($up[$LENGTH] > $left[$LENGTH]) {
+                        $table[$i][$j] = array($up[$LENGTH], $up[$DIFFLENGTH]+1, $UP);
+                    }
+                    else if ($left[$DIFFLENGTH] < $up[$DIFFLENGTH]) {
+                        $table[$i][$j] = array($left[$LENGTH], $left[$DIFFLENGTH]+1, $LEFT);
+                    }
+                    else if ($up[$DIFFLENGTH] < $left[$DIFFLENGTH]) {
+                        $table[$i][$j] = array($up[$LENGTH], $up[$DIFFLENGTH]+1, $UP);
                     }
                     else {
-                        $table[$i][$j] = array($lenleft, $BOTH);
+                        // just pick up, I guess
+                        $table[$i][$j] = array($up[$LENGTH], $up[$DIFFLENGTH]+1, $UP);
                     }
                 }
             }
         }
+
+        $this->dump_table($table, $R, $C);
 
         // Reconstruct.
         $i = count($R)-1;
@@ -59,7 +93,7 @@ class DiffModule {
                 $result[$rix++] = array("+", $C[$j]);
                 $j--;
             }
-            else if ($dir == $UP || $dir == $BOTH) {  // if both we just pick one I guess...
+            else if ($dir == $UP) {
                 $result[$rix++] = array("-", $R[$i]);
                 $i--; 
             }
