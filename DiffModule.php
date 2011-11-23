@@ -84,9 +84,6 @@ class DiffModule {
         $ldiff = $this->diff($orig, $left);
         $rdiff = $this->diff($orig, $right);
 
-        var_dump($ldiff);
-        var_dump($rdiff);
-
         $oi = $li = $ri = $zi = 0;
         while ($oi < count($orig) || $li < count($ldiff) || $ri < count($rdiff)) {
             if ($li < count($ldiff)) {
@@ -107,31 +104,42 @@ class DiffModule {
                 $rtext = null;
             }
 
-            echo("$lstat$ltext\n");
-            echo("$rstat$rtext\n");
-            echo("----\n");
-            
             switch ($lstat.$rstat) {
                 case "  ": 
                     $result[$zi] = array("orig", $orig[$oi]);
                     $zi++; $oi++; $li++; $ri++;
                     break;
                 case " -":
+                    $result[$zi] = array("delright", $rtext);
+                    $zi++; $oi++; $li++; $ri++;
+                    break;
                 case "- ":
+                    $result[$zi] = array("delleft", $ltext);
+                    $zi++; $oi++; $li++; $ri++;
+                    break;
                 case "--":
-                    $oi++; $li++; $ri++;
+                    $result[$zi] = array("delboth", $ltext);
+                    $zi++; $oi++; $li++; $ri++;
+                    break;
+                case "+-":
+                    $result[$zi] = array("delright", $rtext);
+                    $zi++; $oi++; $ri++;
+                    break;
+                case "-+":
+                    $result[$zi] = array("delleft", $ltext);
+                    $zi++; $oi++; $li++;
                     break;
                 case "+ ":
-                    $result[$zi] = array("left", $ltext);
+                    $result[$zi] = array("addleft", $ltext);
                     $zi++; $li++;
                     break;
                 case " +":
-                    $result[$zi] = array("right", $rtext);
+                    $result[$zi] = array("addright", $rtext);
                     $zi++; $ri++;
                     break;
                 case "++":
                     if ($this->compare($ltext, $rtext)) {
-                        $result[$zi] = array("both", $ltext);
+                        $result[$zi] = array("addboth", $ltext);
                     }
                     else {
                         $result[$zi] = array("conflict", $ltext, $rtext);
