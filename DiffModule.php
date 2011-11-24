@@ -76,7 +76,7 @@ class DiffModule {
             }
         }
 
-        $this->dump_table($table, $R, $C);
+        // $this->dump_table($table, $R, $C);
 
         // Reconstruct.
         $i = count($R)-1;
