@@ -9,15 +9,15 @@
    <tr>
     <td>
      <h3>Left</h3>
-     <textarea name="left" rows="30"></textarea>
+     <textarea name="left" rows="30" cols="50"></textarea>
     </td>
     <td>
-     <h3>Orig</h3>
-     <textarea name="orig" rows="30"></textarea>
+     <h3>Original</h3>
+     <textarea name="orig" rows="30" cols="50"></textarea>
     </td>
     <td>
      <h3>Right</h3>
-     <textarea name="right" rows="30"></textarea>
+     <textarea name="right" rows="30" cols="50"></textarea>
     </td>
    </tr>
   </table>

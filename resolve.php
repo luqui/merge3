@@ -12,7 +12,7 @@ $merged = $diff->merge3(preg_split('/\r?\n/', $_POST['orig']),
                         preg_split('/\r?\n/', $_POST['right']));
 ?>
 
-<textarea><?php
+<textarea rows="30" cols="50"><?php
 
 for ($i = 0; $i < count($merged); $i++) {
     $type = $merged[$i][0];

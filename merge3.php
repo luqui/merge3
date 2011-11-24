@@ -3,7 +3,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
 <title>Merged output</title>
 <style>
-pre { margin: 0 }
+pre { margin: 0; width: 50ex }
 
 pre.left.addleft  { background: #bbffbb }
 pre.left.addright { color: white }
